@@ -1,0 +1,62 @@
+@startuml grid_structure
+
+class GridCoord {
+    + x: usize
+    + y: usize
+}
+
+class DataBlock {
+    - coord: GridCoord
+    - digests: HashMap<GridCoord, TDigest>
+    - modified: bool
+    + new(coord: GridCoord): DataBlock
+    + get_or_create_digest(coord: GridCoord): &mut TDigest
+    + save_to_file(path: &Path): Result<()>
+    + load_from_file(coord: GridCoord, path: &Path): Result<Self>
+}
+
+class GridProcessor {
+    - blocks: HashMap<GridCoord, DataBlock>
+    - temp_dir: PathBuf
+    - progress: Arc<MultiProgress>
+    - width: usize
+    - height: usize
+    + new(temp_dir: PathBuf): io::Result<Self>
+    + set_dimensions(width: usize, height: usize)
+    + process_file_batch(files: &[PathBuf]): Result<()>
+    - process_single_file(file: &Path, pb: &ProgressBar): Result<()>
+    - process_block(band: &RasterBand, start_x: usize, start_y: usize, block: &mut DataBlock): Result<()>
+    - save_modified_blocks(): io::Result<()>
+    + calculate_percentiles(percentiles: &[f64]): io::Result<Vec<Vec<Vec<f64>>>>
+    + save_results(results: &[Vec<Vec<f64>>], output_dir: &Path, percentiles: &[f64]): io::Result<()>
+    - get_block_path(block_coord: GridCoord): PathBuf
+    - get_or_load_block(coord: GridCoord): io::Result<&mut DataBlock>
+    - load_block(coord: GridCoord): Result<DataBlock>
+    - save_as_tiff(data: &[Vec<f64>], path: &Path): Result<()>
+}
+
+enum Error {
+    Io(std::io::Error)
+    Gdal(gdal::errors::GdalError)
+    Bincode(bincode::Error)
+}
+
+GridProcessor o-- DataBlock
+DataBlock o-- GridCoord
+DataBlock *-- "many" TDigest
+
+note right of GridProcessor
+  处理栅格数据的主要类，
+  负责文件读写和数据处理
+end note
+
+note right of DataBlock
+  表示一个数据块，
+  包含T-Digest统计信息
+end note
+
+note right of GridCoord
+  表示栅格坐标
+end note
+
+@enduml

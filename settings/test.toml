@@ -1,0 +1,7 @@
+[paths]
+input_dir = "test/input"
+output_dir = "test/output"
+temp_dir = "test/temp"
+
+[logging]
+level = "debug" 

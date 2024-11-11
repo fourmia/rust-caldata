@@ -1,0 +1,7 @@
+[paths]
+input_dir = "/data/input"
+output_dir = "/data/output"
+temp_dir = "/data/temp"
+
+[logging]
+level = "info" 

@@ -1,0 +1,23 @@
+# 基础配置
+[app]
+name = "MyProject"
+version = "0.1.0"
+
+[processing]
+batch_hours = 24
+compression = 100
+chunk_size = 1000
+
+[paths]
+input_dir = "input"
+output_dir = "output"
+temp_dir = "temp"
+
+[percentiles]
+values = [80.0, 85.0, 90.0, 95.0]
+
+[gdal]
+predictor = "YES"
+compress = "DEFLATE"
+tiled = "YES"
+bigtiff = "YES" 
